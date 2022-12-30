@@ -10,9 +10,8 @@ def get_file_names(dir:str) -> None:
     return [i for i in os.listdir(dir) if os.path.isfile(i)]
 
 
-def get_bytes (files:list) -> dict:
+def get_bytes_source(files:list) -> dict:
     binary = {}
-
 
     for i in files:
         with open(i, "rb") as file:
@@ -21,32 +20,35 @@ def get_bytes (files:list) -> dict:
             h1.update(b)
             pair = (b,i)
 
-
-
             binary[h1.hexdigest()] = pair
     return binary
 
 
 
+def get_bytes_dest(files: list) -> dict:
+    binary = {}
+
+    for i in files:
+        with open(i, "rb") as file:
+            b = file.read()
+            h1 = hl.sha256()
+            h1.update(b)
+            binary[h1.hexdigest()] = file
+    return binary
+
+'''
+    source_dict = dict(hash : [data, file name])
+    dest_dict = dict(hash : file_name)
+
+'''
 
 
-
-    ''' file_path = "%s/%s" % (str, i) '''
-
-
-
-
-
-
-
-
-    with open("file.txt", "rb") as file:
-        pass
-
-
-
-
-
+def cross_check(source: dict, dest: dict, source_dir: str, dest_dir: str) -> dict:
+    for i in dest.keys():
+        try:
+            check = source[i]
+        except:
+            pass
 
 
 '''
@@ -61,12 +63,6 @@ def get_bytes (files:list) -> dict:
 '''
 
 
-
-
-
-
-
-
 def choose_dirs() -> None:
     source = str(input("Source directory:\n"))
     destination = str(input("Destination directory"))
@@ -78,16 +74,31 @@ def choose_dirs() -> None:
 
 
 
-
-
-
 def main():
-    l = get_file_names(os.getcwd())
-    m = get_bytes(l)
-    print(m)
+    '''
+    dirs = choose_dirs()
+    source = dirs[0]
+    dest = dirs[1]
+    '''
+
+
+    source = "C:/Users/desmo/projects/FileTransfer"
+    dest = "C:/Users/desmo/projects/FileTransfer/testing"
+    
+
+    s = get_file_names(source)
+    d = get_file_names(dest)
+    s_f = get_bytes_source(s)
+    d_f = get_bytes_dest(d)
+    
+    print(s_f)
+    print(d_f)
+
+
 
 
 
 
 if __name__ == "__main__":
     main()
+
