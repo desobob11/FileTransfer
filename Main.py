@@ -5,6 +5,17 @@ import pathlib as path
 import os
 import io
 
+from PyQt6.QtWidgets import *
+from PyQt6.QtCore import QObject
+from PyQt6.QtGui import QStandardItemModel
+from PyQt6.QtGui import *
+from PyQt6.QtCore import Qt
+import pathlib
+import sys
+import os
+import pickle
+import sqlalchemy as sql
+from GUI import GUI
 
 def get_file_names(dir:str) -> None:
     return [i for i in os.listdir(dir) if os.path.isfile(i)]
@@ -44,11 +55,19 @@ def get_bytes_dest(files: list) -> dict:
 
 
 def cross_check(source: dict, dest: dict, source_dir: str, dest_dir: str) -> dict:
-    for i in dest.keys():
+
+    for i in source.keys():
         try:
-            check = source[i]
+            check = dest[i]
         except:
-            pass
+            source_i = source[i]
+            with open(source_i[1], "wb") as file:
+                with open("%s/%s" % (dest_dir, dest[1]), "wb") as bin:
+                    bin.write(file.read())
+
+
+
+            
 
 
 '''
@@ -75,27 +94,19 @@ def choose_dirs() -> None:
 
 
 def main():
-    '''
-    dirs = choose_dirs()
-    source = dirs[0]
-    dest = dirs[1]
-    '''
+    app = QApplication(sys.argv)
+
+    gui = GUI()
 
 
-    source = "C:/Users/desmo/projects/FileTransfer"
-    dest = "C:/Users/desmo/projects/FileTransfer/testing"
-    
-
-    s = get_file_names(source)
-    d = get_file_names(dest)
-    s_f = get_bytes_source(s)
-    d_f = get_bytes_dest(d)
-    
-    print(s_f)
-    print(d_f)
+    gui.show_main()
 
 
 
+
+
+
+    app.exec()
 
 
 
