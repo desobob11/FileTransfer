@@ -16,6 +16,7 @@ class GUI():
 
     def __init__(self):
         self.view = QMainWindow()
+        self.view.setWindowTitle("Python Bulk File Transfer")
         self.view.setFixedHeight(800)
         self.view.setFixedWidth(800)
         self._main_view = self.main_view()
@@ -23,18 +24,18 @@ class GUI():
         self.model = None
 
 
-    def show_main(self):
+    def show_main(self) -> None:
         self.view.setCentralWidget(self._main_view)
         self.view.show()
 
-    def show_search(self):
+    def show_search(self) -> None:
         self.view.setCentralWidget(self._search_view)
 
     
 
 
 
-    def main_view(self):
+    def main_view(self) -> QWidget:
         widget = QWidget()
         layout = QGridLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -51,9 +52,9 @@ class GUI():
         dir_one_l = QLabel("Source Directory:")
         dir_two_l = QLabel("Destination Directory:")
 
-        dir_one_b.clicked.connect(lambda: self.search_view(dir_one))
-        dir_two_b.clicked.connect(lambda: self.search_view(dir_two))
-        dir_two_b.clicked.connect(self.search_view)
+        dir_one_b.clicked.connect(lambda: self.choose_file(dir_one))
+        dir_two_b.clicked.connect(lambda: self.choose_file(dir_two))
+
 
         layout.addWidget(dir_one_l, 0, 0, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         layout.addWidget(dir_one, 0, 1, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
@@ -63,24 +64,22 @@ class GUI():
         layout.addWidget(dir_two, 1, 1, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         layout.addWidget(dir_two_b, 1, 2, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
+
+        transfer = QPushButton("Transfer")
+        layout.addWidget(transfer, 2, 1, Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop )
+
+
+        output = QTextEdit()
+        output.setReadOnly(True)
+        layout.addWidget(output, 3, 1, Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
+
         widget.setLayout(layout)
 
         return widget
         
 
-    def search_view(self, box: QLineEdit):
-        url = QFileDialog.getExistingDirectoryUrl()
-        print(url.path())
-
-        widget = QWidget()
-        layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-
-
-        widget.setLayout(layout)
-
-        self._search_view = widget
-        self.show_search()
+    def choose_file(self, line: QLineEdit) -> None:
+        line.setText(QFileDialog.getExistingDirectoryUrl().path().removeprefix("/"))
 
 
 
