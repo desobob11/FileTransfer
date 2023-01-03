@@ -4,4 +4,8 @@ import sys
 import io
 import hashlib
 
-print(type(os.listdir()[0]))
+
+
+files = ["%s/%s" % ("C:/Users/desmo/Desktop/Source", i) for i in os.listdir("C:/Users/desmo/Desktop/Source") if os.path.isfile("%s/%s" % ("C:/Users/desmo/Desktop/Source", i))]
+print(files)
+

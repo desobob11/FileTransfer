@@ -9,6 +9,64 @@ import sys
 import os
 import pickle
 import sqlalchemy as sql
+import hashlib
+import datetime as dt
+class Backend():
+
+    
+
+
+
+    
+    def hash_dest(dir: str) -> dict[str, None]:
+        files = ["%s/%s" % (dir, i) for i in os.listdir(dir) if os.path.isfile(i)]
+        hashes = {}
+        for i in files:
+            with open(i, "rb") as bin:
+                contents = bin.read()
+                sha = hashlib.sha256()
+                sha.update(contents)
+                hashes[sha.hexdigest()] = None
+
+        return hashes
+
+    
+    def hash_src(dir: str) -> tuple[dict[str, tuple[str, bytes]], list]:
+        files = ["%s/%s" % (dir, i) for i in os.listdir(dir) if os.path.isfile("%s/%s" % (dir, i))]
+        hash_list = []
+        m = {}
+
+        for i in files:
+            with open(i, "rb") as bin:
+                contents = bin.read()
+                sha = hashlib.sha256()
+                sha.update(contents)
+                hash_list.append(sha.hexdigest())
+                m[sha.hexdigest()] = (i, contents)
+        return m, hash_list
+
+    def cross_check(src_list: list, src_map: dict[str, tuple[str, bytes]], dest_map: dict[str, None], dest: str, output: QTextEdit) -> None:
+        for i in src_list:
+            try:
+                check = dest_map[i]
+            except:
+                file_name = src_map[i][0].split("/")[-1]
+                contents = src_map[i][1]
+                path = "%s/%s" % (dest, file_name)
+                #output.append("Writing %s to destination." % file_name)
+                print("Writing %s to destination." % file_name)
+                with open(path, "wb") as bin:
+                    bin.write(contents)
+                #output.append("%s done.\n" % file_name)
+                print("%s done.\n" % file_name)
+            else:
+                pass
+
+    def run(src: str, dest: str, output: QTextEdit) -> None:
+        dest_dict = Backend.hash_dest(dest)
+        src_dict, src_list = Backend.hash_src(src)
+
+        Backend.cross_check(src_list, src_dict, dest_dict, dest, output)
 
 
 class GUI():
@@ -32,6 +90,12 @@ class GUI():
         self.view.setCentralWidget(self._search_view)
 
     
+    def run_backend(self, dir_one: QLineEdit, dir_two: QLineEdit, output: QTextEdit) -> None:
+        src = dir_one.text()
+        dest = dir_two.text()
+
+
+        Backend.run(src, dest, output)
 
 
 
@@ -65,13 +129,21 @@ class GUI():
         layout.addWidget(dir_two_b, 1, 2, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
 
-        transfer = QPushButton("Transfer")
-        layout.addWidget(transfer, 2, 1, Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop )
 
 
         output = QTextEdit()
         output.setReadOnly(True)
         layout.addWidget(output, 3, 1, Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop)
+
+
+        src = dir_one.text()
+        dest = dir_two.text()
+
+        transfer = QPushButton("Transfer")
+        transfer.clicked.connect(lambda: self.run_backend(dir_one, dir_two, output))
+        layout.addWidget(transfer, 2, 1, Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignTop )
+
+
 
         widget.setLayout(layout)
 
